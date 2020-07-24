@@ -1,6 +1,7 @@
 # PGAcloud_Fitness
 Bachelor's Thesis on deploying Parallel Genetic Algorithms (PGAs) in the cloud.
-This specific repository contains the **cloud fitness container**, a default genetic operator.
+This specific repository contains the **cloud fitness evaluation**,
+the genetic operator which is invoked by the *cloud agent container*.
 
 The genetic operator *Fitness* evaluates individuals fitness value,
 and usually passes them on to the *Runner* container for survival selection at the end of a generation.
