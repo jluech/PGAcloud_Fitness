@@ -1,4 +1,4 @@
-package fitness.individual;
+package fitness.population;
 
 public class IndividualTest {
 }
