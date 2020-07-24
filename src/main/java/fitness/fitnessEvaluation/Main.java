@@ -13,6 +13,8 @@ import java.util.Scanner;
 
 // Quick tutorial on how to create and start a JAR from simple Java code
 // https://docs.oracle.com/javase/tutorial/deployment/jar/appman.html
+// Create jar file like so: jar cfmv FitnessEvaluation.jar Manifest.txt src/main/java/fitness
+// View jar content like so: jar tf FitnessEvaluation.jar
 
 
 public class Main {
