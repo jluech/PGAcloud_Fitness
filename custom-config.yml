@@ -1,0 +1,21 @@
+# Copy this file into "/pga/custom-config.yml" once inside the container.
+
+# Provide the name of the operator to the agent for config retrieval.
+# Use the corresponding name of the PGA config given to the client cli.
+container_name: "fitness"
+
+# Declare keys of properties to look for inside the database (props you require for calling your code).
+property_keys: ['knapsack_capacity', 'items_weights', 'items_profits']
+
+# Declare how to receive the individual and how to provide the output of your computation.
+# Choose: input type ["file" || "value"] and output type ["file" || "console"].
+# If "file" is chosen, provide a file path to the corresponding file (not required for other types).
+input_type: "file"
+output_type: "file"
+input_path: "/pga/fitness/input.yml"
+output_path: "/pga/fitness/output.yml"
+
+# State how to call your code, including potential parameters.
+# If you require additional properties, declare them using the related key used to retrieve it
+# from the DB: "... --param {PROP_KEY}".
+command: "java -jar FitnessEvaluation.jar -Dcapacity={knapsack_capacity} -Dweights={items_weights} -Dprofits={items_profits}"
