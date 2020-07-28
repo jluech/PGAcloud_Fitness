@@ -1,1 +1,1 @@
-Main-Class: fitness.fitnessEvaluation.Main
+Main-Class: fitness.Main

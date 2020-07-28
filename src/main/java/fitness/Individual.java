@@ -1,7 +1,7 @@
-package fitness.population;
+package fitness;
 
 
-public class Individual {
+class Individual {
     private final double DEFAULT_FITNESS = 0;
 
     public String solution;

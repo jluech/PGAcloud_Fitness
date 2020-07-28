@@ -1,6 +1,4 @@
-package fitness.fitnessEvaluation;
-
-import fitness.population.Individual;
+package fitness;
 
 
 class FitnessEvaluation {
