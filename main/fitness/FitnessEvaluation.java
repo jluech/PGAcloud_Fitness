@@ -26,7 +26,13 @@ class FitnessEvaluation {
             available_weight += this.items_weights.get(i);
         }
 
+        System.out.println(String.format("Profits: %.2f", profits));
+        System.out.println(String.format("Used Weight: %.2f", used_weight));
+        System.out.println(String.format("Available Weight: %.2f", available_weight));
+
         double scaled_unused_weight = available_weight * Math.abs(capacity - used_weight);
+        System.out.println(String.format("Scaled Unused Weight: %.2f", scaled_unused_weight));
+
         double fitness = profits - scaled_unused_weight;
 
         individual.fitness = fitness;
