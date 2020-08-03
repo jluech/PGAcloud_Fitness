@@ -2,12 +2,12 @@ package fitness;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 // Quick tutorial on how to create and start a JAR from simple Java code
 // https://docs.oracle.com/javase/tutorial/deployment/jar/appman.html
@@ -20,50 +20,77 @@ public class Main {
     private static final String output_path = "/pga/output.yml";
 
     public static void main(String[] args) {
-        System.out.println("Hello Fitness Evaluation");
-        System.out.println(String.join(" ", args));
-
-        System.out.println("Input: "+input_path);
-        System.out.println("Output: "+output_path);  // TODO: remove?
-
         // Collect individual from input file.
-        Map<String, String> input_data = new HashMap<>();
+        List<Map<String, String>> input_data = new ArrayList<>();
         try {
             File inputFile = new File(input_path);
             Scanner inputReader = new Scanner(inputFile);
             while (inputReader.hasNextLine()) {
                 String line = inputReader.nextLine();
-                String[] data = line.split(": ");
-                input_data.put(data[0], data[1]);
+                line = line.replace("{", "");
+                line = line.replace("}", "");
+                line = line.replace("\"", "");
+                String[] fields = line.split(",");
+                Map<String, String> data = new HashMap<>();
+                for(String field : fields) {
+                    String[] key_value = field.split(":");
+                    String key = key_value[0].strip();
+                    String value = key_value[1].strip();
+                    data.put(key, value);
+                }
+                input_data.add(data);
             }
             inputReader.close();
         } catch (FileNotFoundException e) {
             System.out.println("Provided file was not found.");
             e.printStackTrace();
         }
-        Individual individual = new Individual(input_data.get("solution"), Double.parseDouble(input_data.get("fitness")));
+        Map<String, String> ind_map = input_data.get(0);
+        Individual individual = new Individual(ind_map.get("solution"), Double.parseDouble(ind_map.get("fitness")));
+
+        System.out.println(String.format("Evaluating individual '%s'", individual.solution));
 
         // Parse input data and create fitness operator with it.
-        // Passed in like so "-Dcapacity=150" or "-Dprofits=1,5,2,4,3"
-        String profitsStr = System.getProperty("profits");
-        int[] profits = Arrays.stream(profitsStr.split(", ")).mapToInt(Integer::parseInt).toArray();
-        String weightsStr = System.getProperty("weights");
-        int[] weights = Arrays.stream(weightsStr.split(", ")).mapToInt(Integer::parseInt).toArray();
-        FitnessEvaluation fitEval = new FitnessEvaluation(profits, weights, Double.parseDouble(System.getProperty("capacity")));
+        // Passed in as arguments like so "capacity=150" or "profits=1,5,2,4,3"
+        Map<String, String> argVals = new HashMap<>();
+        for(String arg : args) {
+            String[] keyVal = arg.split("=");
+            String key = keyVal[0];
+            String val = keyVal[1];
+            argVals.put(key, val);
+        }
+
+        String profitsStr = argVals.get("profits");
+        String[] profitsArr = profitsStr.split(",");
+        ArrayList<Integer> profits = new ArrayList<>();
+        for(String profit : profitsArr) {
+            profits.add(Integer.parseInt(profit.strip()));
+        }
+
+        String[] weightsArr = argVals.get("weights").split(",");
+        ArrayList<Integer> weights = new ArrayList<>();
+        for(String weight : weightsArr) {
+            weights.add(Integer.parseInt(weight.strip()));
+        }
+
+        FitnessEvaluation fitEval = new FitnessEvaluation(profits, weights, Double.parseDouble(argVals.get("capacity")));
 
         // Evaluate the fitness of the given individual.
         fitEval.fitEval(individual);
+        System.out.println("Evaluated individual with fitness: " + individual.fitness);
 
         // Write individual with computed fitness to output file.
         try {
-            FileWriter inputWriter = new FileWriter(output_path, true);
-            inputWriter.append("{\n");
-            inputWriter.append(String.format("\tsolution: %s\n", individual.solution));
-            inputWriter.append(String.format("\tfitness: %f\n", individual.fitness));
-            inputWriter.append("}\n");
-            inputWriter.close();
+            List<String> content = Arrays.asList(
+                    "{",
+                    String.format("\t\"solution\": \"%s\",", individual.solution),
+                    String.format("\t\"fitness\": %f", individual.fitness),
+                    "}"
+            );
+            Path file = Paths.get(output_path);
+            Files.write(file, content, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            System.out.println("Could not write individual to file.");
+            System.err.println("Caught IOException: " + e.getMessage());
             e.printStackTrace();
         }
     }

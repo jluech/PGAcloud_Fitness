@@ -4,8 +4,14 @@
 # Use the corresponding name of the PGA config given to the client cli.
 container_name: "fitness"
 
-# Declare keys of properties to look for inside the database (props you require for calling your code).
-property_keys: ['knapsack_capacity', 'items_weights', 'items_profits']
+# Declare keys of properties to look for inside the database (properties you require for calling your code).
+# Remove the brackets and list them like so (leave brackets for an empty list):
+# property_keys:
+# - {key: '<prop_key>', is_list: True|False}
+property_keys:
+- {key: 'knapsack_capacity', is_list: False}
+- {key: 'items_weights', is_list: True}
+- {key: 'items_profits', is_list: True}
 
 # Declare how to receive the individual and how to provide the output of your computation.
 # Choose: input type ["file" || "value"] and output type ["file" || "console"].
@@ -18,4 +24,4 @@ output_path: "/pga/output.yml"
 # State how to call your code, including potential parameters.
 # If you require additional properties, declare them using the related key used to retrieve it
 # from the DB: "... --param {PROP_KEY}".
-command: "java -jar main/FitnessEvaluation.jar -Dcapacity={knapsack_capacity} -Dweights={items_weights} -Dprofits={items_profits}"
+command: "java -jar main/FitnessEvaluation.jar capacity={knapsack_capacity} weights={items_weights} profits={items_profits}"
